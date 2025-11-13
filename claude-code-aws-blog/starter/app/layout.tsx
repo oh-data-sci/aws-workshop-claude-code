@@ -54,34 +54,108 @@ export default function RootLayout({
             .container { max-width: 1200px; margin: 0 auto; }
             .mx-auto { margin-left: auto; margin-right: auto; }
             .px-4 { padding-left: 1rem; padding-right: 1rem; }
-            .py-16 { padding-top: 4rem; padding-bottom: 4rem; }
-            .py-6 { padding-top: 1.5rem; padding-bottom: 1.5rem; }
-            .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+            .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
             .px-8 { padding-left: 2rem; padding-right: 2rem; }
+            .px-12 { padding-left: 3rem; padding-right: 3rem; }
+            .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+            .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+            .py-6 { padding-top: 1.5rem; padding-bottom: 1.5rem; }
+            .py-12 { padding-top: 3rem; padding-bottom: 3rem; }
+            .py-16 { padding-top: 4rem; padding-bottom: 4rem; }
+            .py-20 { padding-top: 5rem; padding-bottom: 5rem; }
             .p-12 { padding: 3rem; }
             .mb-16 { margin-bottom: 4rem; }
+            .mb-8 { margin-bottom: 2rem; }
             .mb-6 { margin-bottom: 1.5rem; }
             .mb-4 { margin-bottom: 1rem; }
             .mt-auto { margin-top: auto; }
 
             .text-center { text-align: center; }
+            .text-6xl { font-size: 3.75rem; line-height: 1; }
+            .text-5xl { font-size: 3rem; line-height: 1; }
             .text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
             .text-2xl { font-size: 1.5rem; line-height: 2rem; }
+            .text-xl { font-size: 1.25rem; line-height: 1.75rem; }
             .text-lg { font-size: 1.125rem; line-height: 1.75rem; }
             .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
             .font-bold { font-weight: 700; }
             .font-semibold { font-weight: 600; }
 
             .rounded-lg { border-radius: 0.5rem; }
+            .rounded-2xl { border-radius: 1rem; }
+            .rounded-3xl { border-radius: 1.5rem; }
             .flex-1 { flex: 1 1 0%; }
+            .inline-block { display: inline-block; }
+            .no-underline { text-decoration: none; }
+            .max-w-4xl { max-width: 56rem; }
 
-            button {
+            /* Button and link styles */
+            a {
+              text-decoration: none;
+            }
+
+            button, a.btn {
               cursor: pointer;
               border: none;
               transition: all 0.3s ease;
+              display: inline-block;
             }
 
-            button:hover.bg-aws-dark { background-color: var(--aws-blue); }
+            .bg-aws-dark:hover {
+              background-color: var(--aws-blue);
+            }
+
+            /* Hero gradient background */
+            .hero-gradient {
+              background: linear-gradient(135deg, #FF9900 0%, #FF9900 100%);
+            }
+
+            /* Fade-in animation */
+            @keyframes fadeIn {
+              from {
+                opacity: 0;
+                transform: translateY(20px);
+              }
+              to {
+                opacity: 1;
+                transform: translateY(0);
+              }
+            }
+
+            .animate-fadeIn {
+              animation: fadeIn 0.8s ease-out forwards;
+            }
+
+            .animation-delay-200 {
+              animation-delay: 0.2s;
+              opacity: 0;
+            }
+
+            .animation-delay-400 {
+              animation-delay: 0.4s;
+              opacity: 0;
+            }
+
+            /* Responsive styles for mobile (< 768px) */
+            .text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
+
+            @media (min-width: 768px) {
+              .md\\:text-5xl { font-size: 3rem; line-height: 1; }
+              .md\\:text-xl { font-size: 1.25rem; line-height: 1.75rem; }
+              .md\\:px-8 { padding-left: 2rem; padding-right: 2rem; }
+              .md\\:py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+              .md\\:py-20 { padding-top: 5rem; padding-bottom: 5rem; }
+            }
+
+            /* Button hover effects */
+            .btn.bg-aws-dark {
+              transition: background-color 0.3s ease, transform 0.2s ease;
+            }
+
+            .btn.bg-aws-dark:hover {
+              background-color: #146EB4;
+              transform: translateY(-2px);
+            }
           `
         }} />
       </head>
