@@ -4,13 +4,15 @@ These functions are designed to demonstrate performance bottlenecks
 that can be identified and optimized using Claude Code.
 """
 
+from collections import Counter
+
 
 def find_duplicates(items):
     """
     Find all duplicate items in a list.
 
-    Current implementation: O(n²) with nested loops
-    Issue: Checks every pair of items and uses 'not in' for list lookup
+    Optimized implementation: O(n) using hash-based sets
+    Uses two sets for O(1) membership testing and insertion
 
     Args:
         items: List of items to check for duplicates
@@ -18,23 +20,28 @@ def find_duplicates(items):
     Returns:
         List of duplicate items (each duplicate appears once)
     """
-    duplicates = []
-    for i in range(len(items)):
-        for j in range(i + 1, len(items)):
-            if items[i] == items[j] and items[i] not in duplicates:
-                duplicates.append(items[i])
-    return duplicates
+    seen = set()
+    duplicates = set()
+
+    for item in items:
+        if item in seen:
+            # Already seen, so it's a duplicate
+            duplicates.add(item)
+        else:
+            # First time seeing this item
+            seen.add(item)
+
+    return list(duplicates)
 
 
 def calculate_statistics(data):
     """
     Calculate mean, median, and mode from a list of numbers.
 
-    Current implementation: Multiple O(n) passes, O(n²) for mode
-    Issues:
-    - Sorts data for median (O(n log n))
-    - Counts occurrences inefficiently with .count() in loop (O(n²))
-    - Makes multiple passes through the data
+    Optimized implementation: O(n log n) overall
+    - Mean: O(n) single pass
+    - Median: O(n log n) sorting required
+    - Mode: O(n) using Counter hash table
 
     Args:
         data: List of numeric values
@@ -45,10 +52,10 @@ def calculate_statistics(data):
     if not data:
         return {"mean": None, "median": None, "mode": None}
 
-    # Calculate mean
+    # Calculate mean - O(n)
     mean = sum(data) / len(data)
 
-    # Calculate median - requires sorting
+    # Calculate median - O(n log n) for sorting
     sorted_data = sorted(data)
     n = len(sorted_data)
     if n % 2 == 1:
@@ -56,14 +63,11 @@ def calculate_statistics(data):
     else:
         median = (sorted_data[n // 2 - 1] + sorted_data[n // 2]) / 2
 
-    # Calculate mode - extremely inefficient
-    mode = None
-    max_count = 0
-    for num in data:
-        count = data.count(num)  # O(n) operation inside O(n) loop!
-        if count > max_count:
-            max_count = count
-            mode = num
+    # Calculate mode - O(n) using Counter
+    # Counter builds a hash table in single pass: O(n)
+    # most_common(1) finds the maximum: O(n)
+    counts = Counter(data)
+    mode = counts.most_common(1)[0][0]
 
     return {"mean": mean, "median": median, "mode": mode}
 
