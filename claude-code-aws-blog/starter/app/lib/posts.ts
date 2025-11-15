@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
+import { calculateReadingTime } from './readingTime';
 
 // Define the structure of post frontmatter
 export interface PostFrontmatter {
@@ -18,6 +19,7 @@ export interface Post {
   slug: string;
   frontmatter: PostFrontmatter;
   content: string;
+  readingTime: number; // Reading time in minutes
 }
 
 // Path to the posts directory
@@ -52,7 +54,8 @@ export function getAllPosts(): Post[] {
       return {
         slug,
         frontmatter: data as PostFrontmatter,
-        content
+        content,
+        readingTime: calculateReadingTime(content)
       };
     })
     // Filter out unpublished posts
@@ -94,7 +97,8 @@ export function getPostBySlug(slug: string): Post | null {
     return {
       slug,
       frontmatter: data as PostFrontmatter,
-      content
+      content,
+      readingTime: calculateReadingTime(content)
     };
   } catch (error) {
     console.error(`Error reading post ${slug}:`, error);

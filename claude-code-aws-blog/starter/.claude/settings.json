@@ -1,0 +1,30 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Read|Grep",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash hooks/read_hook.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash hooks/format_markdown.sh"
+          },
+          {
+            "type": "command",
+            "command": "node hooks/validate-frontmatter.js"
+          }
+        ]
+      }
+    ]
+  }
+}
