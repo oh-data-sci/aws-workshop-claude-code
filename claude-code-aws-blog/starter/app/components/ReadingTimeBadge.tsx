@@ -1,24 +1,34 @@
+import { formatReadingTime } from '@/app/lib/readingTime';
+
 interface ReadingTimeBadgeProps {
   minutes: number;
 }
 
+/**
+ * ReadingTimeBadge Component
+ *
+ * Displays an estimated reading time badge with AWS Orange styling and an open book icon.
+ * This is a Server Component (no client-side JavaScript).
+ *
+ * @param minutes - Reading time in minutes
+ */
 export default function ReadingTimeBadge({ minutes }: ReadingTimeBadgeProps) {
   return (
-    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium bg-aws-orange text-white">
+    <span className="inline-flex items-center gap-1.5 bg-aws-orange/10 text-aws-orange px-3 py-1 rounded-full text-sm font-medium">
       <svg
         className="w-4 h-4"
+        viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
-        viewBox="0 0 24 24"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
       >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-        />
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
       </svg>
-      {minutes} min read
+      <span>{formatReadingTime(minutes)}</span>
     </span>
   );
 }

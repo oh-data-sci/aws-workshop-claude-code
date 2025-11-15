@@ -2,6 +2,8 @@ import { notFound } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { getPostBySlug, getAllPosts } from '@/app/lib/posts';
+import ReadingTimeBadge from '@/app/components/ReadingTimeBadge';
+import Comments from '@/app/components/Comments';
 import type { Metadata } from 'next';
 
 interface PostPageProps {
@@ -43,7 +45,7 @@ export default function PostPage({ params }: PostPageProps) {
     notFound();
   }
 
-  const { frontmatter, content } = post;
+  const { frontmatter, content, readingTime } = post;
 
   return (
     <div className="container mx-auto px-4 py-16">
@@ -61,7 +63,7 @@ export default function PostPage({ params }: PostPageProps) {
         </h1>
 
         {/* Meta Information */}
-        <div className="text-aws-dark-gray mb-8">
+        <div className="text-aws-dark-gray mb-8 flex flex-wrap items-center gap-2">
           <time dateTime={frontmatter.date}>
             {new Date(frontmatter.date).toLocaleDateString('en-US', {
               month: 'long',
@@ -69,8 +71,10 @@ export default function PostPage({ params }: PostPageProps) {
               year: 'numeric'
             })}
           </time>
-          <span className="mx-2">•</span>
+          <span className="mx-1">•</span>
           <span className="italic">by {frontmatter.author}</span>
+          <span className="mx-1">•</span>
+          <ReadingTimeBadge minutes={readingTime} />
         </div>
 
         {/* Tags */}
@@ -91,6 +95,9 @@ export default function PostPage({ params }: PostPageProps) {
             {content}
           </ReactMarkdown>
         </div>
+
+        {/* Comments Section */}
+        <Comments postSlug={params.slug} />
       </article>
     </div>
   );
