@@ -1,0 +1,1 @@
+- When creating blog components, always use TypeScript with strict types, Tailwind CSS for styling, and follow the AWS color scheme defined in CLAUDE.md. All blog posts should be stored as MDX files in the /content/posts directory.

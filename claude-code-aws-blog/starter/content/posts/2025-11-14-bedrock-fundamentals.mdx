@@ -1,0 +1,321 @@
+---
+title: "AWS Bedrock Fundamentals: Building AI Applications at Scale"
+date: "2025-11-14"
+author: "AWS Developer"
+excerpt: "Learn the fundamentals of AWS Bedrock and how to build scalable AI applications with foundation models in your production environment."
+category: "Bedrock"
+tags: ["AWS", "Claude Code", "Bedrock", "AI", "Machine Learning", "Foundation Models"]
+published: true
+---
+
+## Introduction
+
+AWS Bedrock is Amazon's fully managed service that provides access to high-performing foundation models (FMs) from leading AI companies through a unified API. Whether you're building chatbots, content generation systems, or complex AI workflows, Bedrock simplifies the process of integrating AI capabilities into your applications.
+
+In this guide, you'll learn:
+- Core concepts and architecture of AWS Bedrock
+- How to set up and configure Bedrock in your AWS environment
+- Best practices for building production-ready AI applications
+- Cost optimization strategies and security considerations
+
+Bedrock matters for AWS developers because it eliminates the undifferentiated heavy lifting of managing infrastructure, fine-tuning models, and handling scaling—letting you focus on building innovative features for your users.
+
+## Prerequisites
+
+Before diving into Bedrock, ensure you have:
+
+### AWS Resources
+- An active AWS account with appropriate permissions
+- Access to AWS Bedrock in a supported region (us-east-1, us-west-2, etc.)
+- IAM permissions for Bedrock API calls (`bedrock:*` or specific action permissions)
+
+### Tools and Dependencies
+- AWS CLI v2.x or higher installed and configured
+- AWS SDK for your preferred language (Python boto3, JavaScript AWS SDK, etc.)
+- Basic familiarity with AWS IAM roles and policies
+
+### Prior Knowledge
+- Understanding of API calls and REST principles
+- Basic knowledge of AWS services (IAM, CloudWatch, S3)
+- Familiarity with JSON for request/response handling
+
+## Step-by-Step Guide
+
+### Step 1: Enable Model Access
+
+First, you need to request access to foundation models in the Bedrock console:
+
+1. Navigate to the AWS Bedrock console
+2. Go to "Model access" in the left sidebar
+3. Click "Manage model access"
+4. Select the models you want to use (e.g., Claude 3.5 Sonnet, Llama 3, Titan)
+5. Review and accept the EULAs
+6. Submit your access request
+
+**Note**: Some models grant instant access, while others may require AWS approval (typically within minutes to hours).
+
+### Step 2: Set Up IAM Permissions
+
+Create an IAM policy that grants Bedrock permissions:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "bedrock:InvokeModel",
+        "bedrock:InvokeModelWithResponseStream"
+      ],
+      "Resource": "arn:aws:bedrock:*::foundation-model/*"
+    }
+  ]
+}
+```
+
+Attach this policy to your IAM user, role, or EC2 instance profile.
+
+### Step 3: Make Your First API Call
+
+Here's a basic example using Python and boto3:
+
+```python
+import boto3
+import json
+
+# Initialize the Bedrock client
+bedrock = boto3.client(
+    service_name='bedrock-runtime',
+    region_name='us-east-1'
+)
+
+# Prepare the request
+model_id = 'anthropic.claude-3-5-sonnet-20250929-v1:0'
+prompt = "Explain AWS Bedrock in one sentence."
+
+request_body = {
+    "anthropic_version": "bedrock-2023-05-31",
+    "max_tokens": 200,
+    "messages": [
+        {
+            "role": "user",
+            "content": prompt
+        }
+    ]
+}
+
+# Invoke the model
+response = bedrock.invoke_model(
+    modelId=model_id,
+    body=json.dumps(request_body)
+)
+
+# Parse the response
+response_body = json.loads(response['body'].read())
+completion = response_body['content'][0]['text']
+print(completion)
+```
+
+### Step 4: Implement Streaming Responses
+
+For better user experience with long-form content, use streaming:
+
+```python
+response = bedrock.invoke_model_with_response_stream(
+    modelId=model_id,
+    body=json.dumps(request_body)
+)
+
+# Process the stream
+stream = response['body']
+for event in stream:
+    chunk = json.loads(event['chunk']['bytes'])
+    if chunk['type'] == 'content_block_delta':
+        if 'delta' in chunk and 'text' in chunk['delta']:
+            print(chunk['delta']['text'], end='', flush=True)
+```
+
+### Step 5: Add Error Handling and Retries
+
+Implement robust error handling for production applications:
+
+```python
+import time
+from botocore.exceptions import ClientError
+
+def invoke_bedrock_with_retry(bedrock_client, model_id, request_body, max_retries=3):
+    for attempt in range(max_retries):
+        try:
+            response = bedrock_client.invoke_model(
+                modelId=model_id,
+                body=json.dumps(request_body)
+            )
+            return json.loads(response['body'].read())
+
+        except ClientError as e:
+            error_code = e.response['Error']['Code']
+
+            # Handle throttling
+            if error_code == 'ThrottlingException':
+                if attempt < max_retries - 1:
+                    wait_time = 2 ** attempt  # Exponential backoff
+                    print(f"Throttled. Retrying in {wait_time}s...")
+                    time.sleep(wait_time)
+                    continue
+
+            # Handle validation errors
+            elif error_code == 'ValidationException':
+                print(f"Validation error: {e.response['Error']['Message']}")
+                raise
+
+            # Handle access denied
+            elif error_code == 'AccessDeniedException':
+                print("Access denied. Check IAM permissions and model access.")
+                raise
+
+            else:
+                raise
+
+    raise Exception(f"Failed after {max_retries} attempts")
+```
+
+## Best Practices
+
+### 1. Choose the Right Model for Your Use Case
+
+Different models excel at different tasks:
+- **Claude 3.5 Sonnet**: Complex reasoning, code generation, long-form content
+- **Claude 3 Haiku**: Fast responses, classification, simple tasks
+- **Amazon Titan**: Cost-effective text generation and embeddings
+- **Llama 3**: Open-source option for customization
+
+### 2. Optimize Token Usage
+
+Minimize costs by managing token consumption:
+- Set appropriate `max_tokens` limits
+- Use system prompts efficiently
+- Cache static context when possible
+- Implement prompt compression techniques
+
+### 3. Implement Caching Strategies
+
+Leverage response caching for repeated queries:
+- Use Amazon ElastiCache or DynamoDB for response storage
+- Implement cache invalidation policies
+- Consider semantic caching for similar queries
+
+### 4. Monitor and Log API Calls
+
+Set up comprehensive monitoring:
+- Enable CloudWatch logging for Bedrock API calls
+- Track metrics: latency, token usage, error rates
+- Set up CloudWatch alarms for anomalies
+- Use AWS X-Ray for distributed tracing
+
+### 5. Security Considerations
+
+Protect your AI applications:
+- Use IAM roles instead of access keys
+- Enable VPC endpoints for private connectivity
+- Implement input validation and sanitization
+- Add content filtering for user-generated prompts
+- Encrypt sensitive data at rest and in transit
+- Use AWS Secrets Manager for API credentials
+
+### 6. Cost Optimization
+
+Reduce Bedrock costs effectively:
+- Start with smaller models (Haiku) for simple tasks
+- Batch requests when possible
+- Implement request throttling and rate limiting
+- Use AWS Cost Explorer to track spending
+- Set up billing alerts and budgets
+
+## Common Pitfalls
+
+### 1. Insufficient Model Access
+
+**Problem**: Getting `AccessDeniedException` errors even with correct IAM permissions.
+
+**Solution**: Remember to request model access in the Bedrock console. IAM permissions alone aren't enough—you need both IAM permissions AND model access approval.
+
+### 2. Token Limit Exceeded
+
+**Problem**: Requests fail with token limit errors.
+
+**Solution**:
+- Check the model's maximum token limits (input + output)
+- Implement token counting before API calls
+- Truncate or summarize long inputs
+- Use models with larger context windows if needed
+
+### 3. Not Handling Throttling
+
+**Problem**: API calls fail during high traffic periods.
+
+**Solution**: Always implement exponential backoff retry logic. Bedrock has rate limits, and production applications must handle throttling gracefully.
+
+### 4. Ignoring Regional Availability
+
+**Problem**: Service unavailable errors in certain regions.
+
+**Solution**: Check AWS documentation for Bedrock regional availability. Not all models are available in all regions. Use us-east-1 or us-west-2 for widest model selection.
+
+### 5. Hardcoding Model IDs
+
+**Problem**: Application breaks when model versions update.
+
+**Solution**:
+- Use environment variables or configuration files for model IDs
+- Implement fallback models
+- Subscribe to AWS updates for model deprecation notices
+
+### 6. Insufficient Error Context
+
+**Problem**: Generic error messages make debugging difficult.
+
+**Solution**: Log request IDs, model IDs, and full error responses. This information is crucial for AWS Support when troubleshooting issues.
+
+## Conclusion
+
+AWS Bedrock provides a powerful, scalable platform for building AI applications without the complexity of managing infrastructure or fine-tuning models. By following the fundamentals covered in this guide, you can:
+
+- Set up Bedrock with proper security and permissions
+- Make API calls with error handling and retry logic
+- Choose appropriate models for your use cases
+- Optimize costs and performance
+- Avoid common pitfalls in production deployments
+
+**Key Takeaways**:
+- Always request model access before trying to use models
+- Implement proper error handling and retry logic from day one
+- Monitor token usage to control costs
+- Choose the right model for each specific task
+- Security and cost optimization should be built-in, not bolted on
+
+**Next Steps**:
+- Experiment with different models to understand their strengths
+- Build a simple chatbot or content generation tool
+- Explore Bedrock's Agents and Knowledge Bases features
+- Integrate Bedrock with your existing AWS services (Lambda, API Gateway, etc.)
+- Learn about Retrieval-Augmented Generation (RAG) patterns
+
+## Further Reading
+
+### AWS Documentation
+- [AWS Bedrock Developer Guide](https://docs.aws.amazon.com/bedrock/latest/userguide/)
+- [Bedrock API Reference](https://docs.aws.amazon.com/bedrock/latest/APIReference/)
+- [Supported Foundation Models](https://docs.aws.amazon.com/bedrock/latest/userguide/models-supported.html)
+- [Bedrock Pricing](https://aws.amazon.com/bedrock/pricing/)
+
+### Related Blog Posts
+- Getting Started with Claude Code and AWS
+- Building Custom MCP Servers for AI Applications
+- AWS Bedrock Integration Patterns for Production
+
+### Additional Resources
+- [Anthropic Claude API Documentation](https://docs.anthropic.com/)
+- [AWS Well-Architected Framework for AI/ML](https://docs.aws.amazon.com/wellarchitected/latest/machine-learning-lens/)
+- [AWS Samples GitHub Repository](https://github.com/aws-samples/amazon-bedrock-samples)
+- [AWS Machine Learning Blog](https://aws.amazon.com/blogs/machine-learning/)

@@ -1,4 +1,9 @@
+import { getAllPosts } from '@/app/lib/posts';
+import PostList from '@/app/components/PostList';
+
 export default function Home() {
+  const posts = getAllPosts();
+
   return (
     <div className="container mx-auto px-4 py-16">
       {/* Hero Section */}
@@ -21,12 +26,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Post List - Students will build this in Exercise 006 */}
+      {/* Post List */}
       <section id="posts">
-        <h2 className="text-4xl font-bold mb-6">Recent Posts</h2>
-        <div className="text-aws-dark-gray">
-          <p>Post list will be added in Exercise 006</p>
-        </div>
+        <h2 className="text-4xl font-bold mb-6 text-aws-dark">Recent Posts</h2>
+        <PostList posts={posts} />
       </section>
     </div>
   );

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import Header from "@/app/components/Header";
 
 export const metadata: Metadata = {
   title: "AWS Claude Code Blog",
@@ -156,10 +157,180 @@ export default function RootLayout({
               background-color: #146EB4;
               transform: translateY(-2px);
             }
+
+            /* Grid layout */
+            .grid { display: grid; }
+            .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+            .gap-2 { gap: 0.5rem; }
+            .gap-6 { gap: 1.5rem; }
+            .flex { display: flex; }
+            .flex-col { flex-direction: column; }
+            .flex-wrap { flex-wrap: wrap; }
+            .h-full { height: 100%; }
+            .items-center { align-items: center; }
+            .justify-between { justify-content: space-between; }
+            .gap-3 { gap: 0.75rem; }
+
+            /* Text colors */
+            .text-aws-dark { color: var(--aws-dark); }
+
+            /* Borders */
+            .border-2 { border-width: 2px; }
+            .border-4 { border-width: 4px; }
+            .border-aws-light-gray { border-color: var(--aws-light-gray); }
+            .border-aws-orange { border-color: var(--aws-orange); }
+
+            /* Backgrounds */
+            .bg-white { background-color: #ffffff; }
+            .bg-aws-light-gray { background-color: var(--aws-light-gray); }
+
+            /* Shadows */
+            .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+
+            /* Padding utilities */
+            .p-8 { padding: 2rem; }
+            .py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+            .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+            .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+
+            /* Margin utilities */
+            .mb-12 { margin-bottom: 3rem; }
+            .mx-2 { margin-left: 0.5rem; margin-right: 0.5rem; }
+
+            /* Max width */
+            .max-w-none { max-width: none; }
+
+            /* Transitions */
+            .transition-all { transition: all 0.3s ease; }
+            .transition-colors { transition: color 0.3s ease; }
+
+            /* Header/Navigation styles */
+            .sticky { position: sticky; }
+            .top-0 { top: 0; }
+            .z-50 { z-index: 50; }
+
+            .hover-logo:hover .bg-aws-orange {
+              background-color: var(--aws-blue);
+            }
+
+            /* Hide text on small screens */
+            .hidden { display: none; }
+
+            @media (min-width: 640px) {
+              .sm\\:inline { display: inline; }
+            }
+
+            /* Hover effects for post cards */
+            .hover\\:border-aws-blue:hover {
+              border-color: var(--aws-blue);
+            }
+
+            /* Responsive grid for tablets and desktops */
+            @media (min-width: 768px) {
+              .md\\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            }
+
+            @media (min-width: 1024px) {
+              .lg\\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+            }
+
+            /* Prose styles for markdown content */
+            .prose {
+              color: var(--aws-dark);
+              max-width: 65ch;
+            }
+
+            .prose h1, .prose h2, .prose h3, .prose h4 {
+              color: var(--aws-dark);
+              font-weight: 700;
+              margin-top: 2rem;
+              margin-bottom: 1rem;
+            }
+
+            .prose h1 { font-size: 2.25rem; line-height: 2.5rem; }
+            .prose h2 { font-size: 1.875rem; line-height: 2.25rem; }
+            .prose h3 { font-size: 1.5rem; line-height: 2rem; }
+
+            .prose p {
+              margin-bottom: 1.25rem;
+              line-height: 1.75;
+            }
+
+            .prose ul, .prose ol {
+              margin-top: 1.25rem;
+              margin-bottom: 1.25rem;
+              padding-left: 1.5rem;
+            }
+
+            .prose li {
+              margin-bottom: 0.5rem;
+            }
+
+            .prose code {
+              background-color: var(--aws-light-gray);
+              padding: 0.25rem 0.5rem;
+              border-radius: 0.25rem;
+              font-family: monospace;
+              font-size: 0.875em;
+            }
+
+            .prose pre {
+              background-color: var(--aws-light-gray);
+              padding: 1rem;
+              border-radius: 0.5rem;
+              overflow-x: auto;
+              margin: 1.5rem 0;
+            }
+
+            .prose pre code {
+              background-color: transparent;
+              padding: 0;
+            }
+
+            .prose a {
+              color: var(--aws-blue);
+              text-decoration: underline;
+            }
+
+            .prose a:hover {
+              color: var(--aws-orange);
+            }
+
+            .prose strong {
+              font-weight: 600;
+              color: var(--aws-dark);
+            }
+
+            .prose table {
+              width: 100%;
+              margin: 1.5rem 0;
+              border-collapse: collapse;
+            }
+
+            .prose th, .prose td {
+              border: 1px solid var(--aws-light-gray);
+              padding: 0.75rem;
+              text-align: left;
+            }
+
+            .prose th {
+              background-color: var(--aws-light-gray);
+              font-weight: 600;
+            }
+
+            .prose-lg {
+              font-size: 1.125rem;
+              line-height: 1.75rem;
+            }
+
+            .prose-lg h1 { font-size: 2.5rem; }
+            .prose-lg h2 { font-size: 2rem; }
+            .prose-lg h3 { font-size: 1.75rem; }
           `
         }} />
       </head>
       <body className="antialiased min-h-screen flex flex-col">
+        <Header />
         <main className="flex-1">
           {children}
         </main>
